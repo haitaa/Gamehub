@@ -20,6 +20,22 @@ model User {
   externalUserId String  @unique @map("external_user_id")
   bio            String?
 
+  following  Follow[] @relation("Following")
+  followedBy Follow[] @relation("FollowedBy")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model Follow {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  followerId  String @map("follower_id") @db.ObjectId
+  followingId String @map("following_id") @db.ObjectId
+
+  follower  User @relation(name: "Following", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation(name: "FollowedBy", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
 }
